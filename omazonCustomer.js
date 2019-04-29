@@ -25,6 +25,7 @@ connection.connect(function (err) {
     }
     start();
 });
+
 function start() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -40,7 +41,7 @@ function choosingProduct() {
                 type: "input",
                 name: "items_id",
                 message: "Enter item id of the product you would like to purchase.",
-                
+
             }
         ]).then(function (product) {
             for (var i = 0; i < res.length; i++) {
@@ -50,19 +51,30 @@ function choosingProduct() {
                         type: "input",
                         name: "quantity",
                         message: "How many " + res[i].product_name + "s would you like to purchase?",
-                        
+
                     }]).then(function (cart) {
+                        if (res[prod].stock_quantity === 0) {
+                            console.log("This item is out of stock")
+                        }
                         if (res[prod].stock_quantity >= cart.quantity) {
-                            var total = cart.quantity * res[prod].price;
+                            var total = (cart.quantity * res[prod].price).toFixed(2);
                             console.log("You total is $" + total);
                         }
                         if (res[prod].stock_quantity < cart.quantity) {
                             console.log("We have " + res[prod].stock_quantity + " in stock");
-                        
                         }
-                        if (res[prod].stock_quantity === 0) {
-                            console.log("This item is out of stock")
+                        if ((res[prod].stock_quantity - cart.quantity) > 0) {
+                            connection.query("UPDATE Products SET stock_quantity = " + (res[prod].stock_quantity - cart.quantity) + 
+                            " WHERE item_id = " + res[prod].item_id, function (err, res2) {
+                                if (err) throw err;
+                                console.table(res2);
+                                connection.end()
+                    
+                            });
+                    
                         }
+
+
 
                     })
                 }
@@ -71,12 +83,27 @@ function choosingProduct() {
 
     });
 }
+
+/*function updateProduct() {
+    if ((res[prod].stock_quantity - cart.quantity) > 0) {
+        connection.query("UPDATE Products SET stock_quantity = " + (res[prod].stock_quantity - cart.quantity) + 
+        " WHERE item_id = " + res[prod].item_id, function (err, res2) {
+            if (err) throw err;
+            console.table(res2);
+            connection.end()
+
+        });
+
+    }
+
+}*/
+
 /*function purchase(){
     var total = cart.quantity * res[prod].price;
     console.log("You total is $" + total);
 }*/
 
-//function updateProduct()
+//
 
 /*inquirer.prompt([{
     type: "list",
