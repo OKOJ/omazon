@@ -21,5 +21,5 @@ The Omazon will take in orders from customers and deplete stock from the store's
 - NodeJS
 - MySQL
 - npm packages:
-        * mysql
-        * prompt
+* mysql
+* prompt
