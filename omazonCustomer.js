@@ -45,10 +45,12 @@ function choosingProduct() {
 
             }
         ]).then(function (product) {
+
             for (var i = 0; i < res.length; i++) {
                 if (product.items_id == res[i].item_id) {
                     var prod = i;
-        //choose a quantity
+
+                    //choose a quantity
                     inquirer.prompt([{
                         type: "input",
                         name: "quantity",
@@ -58,7 +60,7 @@ function choosingProduct() {
                         if (res[prod].stock_quantity === 0) {
                             console.log("This item is out of stock")
                             console.log("Would you like to choose an other item?");
-                            choosingProduct();
+                            //choosingProduct();
 
                         }
                         if (res[prod].stock_quantity >= cart.quantity) {
@@ -71,12 +73,21 @@ function choosingProduct() {
                         if (res[prod].stock_quantity < cart.quantity) {
                             console.log("We have " + res[prod].stock_quantity + " in stock");
                         }
-                        if ((res[prod].stock_quantity - cart.quantity) > 0) {
+                        if ((res[prod].stock_quantity - cart.quantity) >= 0) {
                             connection.query("UPDATE Products SET stock_quantity = " + (res[prod].stock_quantity - cart.quantity) +
                                 " WHERE item_id = " + res[prod].item_id, function (err, res2) {
                                     if (err) throw err;
-                                    //console.table(res2);
-                                    connection.end()
+                                    console.log("Checkout our new inventory.")
+                                    console.log("=====================================")
+                                    connection.query("SELECT * FROM products", function (err, res) {
+                                        if (err) throw err;
+                                        console.table(res);
+                                        //choosingProduct();
+                                    })
+                                    //console.table(res2.affectedRows);
+                                    // connection.end()
+                                    //start();
+                                    
 
                                 });
 
@@ -85,12 +96,14 @@ function choosingProduct() {
 
 
                     })
+
                 }
             }
         })
 
     });
     //reStart()
+
 
 }
 
@@ -129,3 +142,22 @@ reStart()*/
     message: "Would you like to buy them all?",
     choices:["Buy them all","Buy new quantity","Think  about it"]
 }])*/
+/* if (res[prod].stock_quantity === 0) {
+
+                        console.log("This item is out of stock")
+                        //console.log("Would you like to choose an other item?");
+                        inquirer.prompt([{
+                            type: "list",
+                            name: "outOfStock",
+                            message: "Would you like to choose an other item?",
+                            choices: ["yes", "no"]
+                        }]).then(function (answer) {
+                            if (answer.choices === "yes") {
+                                choosingProduct()
+                            }else if (answer.choices === "no") {
+
+                                console.log("Thank you for visiting our store!");
+                                connection.end()
+                            }
+                        })
+                    } */
